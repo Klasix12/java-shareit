@@ -17,19 +17,19 @@ import java.util.List;
 @Slf4j
 public class ItemController {
 
-    private final String USER_ID_HEADER = "X-Sharer-User-Id";
+    private final String userIdHeader = "X-Sharer-User-Id";
 
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto addItem(@RequestHeader(USER_ID_HEADER) Long userId,
+    public ItemDto addItem(@RequestHeader(userIdHeader) Long userId,
                            @Validated(OnCreate.class) @RequestBody ItemDto item) {
         log.trace("Добавление предмета");
         return itemService.addItem(userId, item);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader(USER_ID_HEADER) Long userId,
+    public ItemDto updateItem(@RequestHeader(userIdHeader) Long userId,
                               @Validated(OnUpdate.class) @RequestBody ItemDto item,
                               @PathVariable Long itemId) {
         log.trace("Обновление предмета");
@@ -43,7 +43,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader(USER_ID_HEADER) Long userId) {
+    public List<ItemDto> getUserItems(@RequestHeader(userIdHeader) Long userId) {
         log.trace("Получение предметов пользователя");
         return itemService.getUserItems(userId);
     }
