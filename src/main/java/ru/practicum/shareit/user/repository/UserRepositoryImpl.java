@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.EmailAlreadyRegistered;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.HashMap;
@@ -27,21 +26,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User updateUser(User user) {
-        if (users.get(user.getId()) == null) {
-            throw new NotFoundException("Не найден пользователь", "Не найден пользователь с id " + userId);
-        }
         if (isEmailAlreadyRegistered(user)) {
             throw new EmailAlreadyRegistered("Неверный email", "Пользователь с таким email уже зарегистрирован");
         }
-        User newUser = users.get(user.getId());
-        if (user.getName() != null) {
-            newUser.setName(user.getName());
-        }
-        if (user.getEmail() != null) {
-            newUser.setEmail(user.getEmail());
-        }
-        newUser.setId(user.getId());
-        return newUser;
+        users.put(user.getId(), user);
+        return user;
     }
 
     @Override

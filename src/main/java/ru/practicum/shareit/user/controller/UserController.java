@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.storage.UserService;
 import ru.practicum.shareit.validators.OnCreate;
 import ru.practicum.shareit.validators.OnUpdate;
@@ -19,22 +19,22 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User addUser(@Validated(OnCreate.class) @RequestBody User user) {
+    public UserDto addUser(@Validated(OnCreate.class) @RequestBody UserDto user) {
         log.trace("Добавление пользователя");
         return userService.addUser(user);
     }
 
     @PatchMapping("/{id}")
-    public User updateUser(@Validated(OnUpdate.class) @RequestBody User user,
-                           @PathVariable Long id) {
+    public UserDto updateUser(@Validated(OnUpdate.class) @RequestBody UserDto user,
+                              @PathVariable Long id) {
         log.trace("Обновление пользователя");
         return userService.updateUser(id, user);
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable Long id) {
+    public UserDto getUser(@PathVariable Long id) {
         log.trace("Получение пользователя");
-        return userService.getUserById(id);
+        return userService.getUserByIdOrThrow(id);
     }
 
     @DeleteMapping("/{id}")

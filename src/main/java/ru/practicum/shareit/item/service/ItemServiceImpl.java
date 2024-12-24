@@ -8,10 +8,11 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserService;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,24 +24,31 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
     @Override
-    public ItemDto addItem(Long userId, Item item) {
-        User user = userService.getUserById(userId);
-        item.setOwner(user);
+    public ItemDto addItem(Long userId, ItemDto item) {
+        User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
         log.info("Пользователь {} добавил предмет {}", user, item);
-        return ItemMapper.toDto(itemRepository.addItem(item));
+        return ItemMapper.toDto(itemRepository.addItem(ItemMapper.toEntity(item, user)));
     }
 
     @Override
-    public ItemDto updateItem(Long userId, Item item, Long itemId) {
-        User user = userService.getUserById(userId);
-        item.setOwner(user);
-        item.setId(itemId);
-        log.info("Пользователь {} обновил предмет {}", user, item);
-        return ItemMapper.toDto(itemRepository.updateItem(item));
+    public ItemDto updateItem(Long userId, ItemDto newItem, Long itemId) {
+        User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
+        Item oldItem = ItemMapper.toEntity(getItemByIdOrThrow(itemId), user);
+        if (newItem.getName() != null) {
+            oldItem.setName(newItem.getName());
+        }
+        if (newItem.getDescription() != null) {
+            oldItem.setDescription(newItem.getDescription());
+        }
+        if (newItem.getAvailable() != null) {
+            oldItem.setAvailable(newItem.getAvailable());
+        }
+        log.info("Пользователь {} обновил предмет {}", user, oldItem);
+        return ItemMapper.toDto(itemRepository.updateItem(oldItem));
     }
 
     @Override
-    public ItemDto getItem(Long itemId) {
+    public ItemDto getItemByIdOrThrow(Long itemId) {
         log.info("Получение предмета с id {}", itemId);
         return ItemMapper.toDto(itemRepository.getItem(itemId)
                 .orElseThrow(() -> new NotFoundException("Не найден предмет", "Не найден предмет с id " + itemId)));
@@ -57,7 +65,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> searchItems(String text) {
         if (text.isEmpty() || text.isBlank()) {
-            return new ArrayList<>();
+            log.info("Передана пустая строка");
+            return Collections.emptyList();
         }
         log.info("Поиск предметов по слову {}", text);
         return itemRepository.searchItems(text).stream()
