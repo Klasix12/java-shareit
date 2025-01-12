@@ -18,13 +18,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(UserDto user) {
         log.info("Добавление пользователя {}", user);
-        return UserMapper.toDto(userRepository.addUser(UserMapper.toEntity(user)));
+        return UserMapper.toDto(userRepository.save(UserMapper.toEntity(user)));
     }
 
     @Override
     public UserDto getUserByIdOrThrow(Long userId) {
         log.info("Получение пользователя с id {}", userId);
-        return UserMapper.toDto(userRepository.getUser(userId)
+        return UserMapper.toDto(userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Не найден пользователь", "Не найден пользователь с id " + userId)));
     }
 
@@ -38,13 +38,13 @@ public class UserServiceImpl implements UserService {
             oldUser.setEmail(user.getEmail());
         }
         log.info("Обновление пользователя с id {}", id);
-        return UserMapper.toDto(userRepository.updateUser(oldUser));
+        return UserMapper.toDto(userRepository.save(oldUser));
     }
 
     @Override
     public void deleteUser(Long id) {
         log.info("Удаление пользователя {}", id);
         getUserByIdOrThrow(id);
-        userRepository.deleteUser(id);
+        userRepository.deleteById(id);
     }
 }

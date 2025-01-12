@@ -27,7 +27,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto addItem(Long userId, ItemDto item) {
         User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
         log.info("Пользователь {} добавил предмет {}", user, item);
-        return ItemMapper.toDto(itemRepository.addItem(ItemMapper.toEntity(item, user)));
+        return ItemMapper.toDto(itemRepository.save(ItemMapper.toEntity(item, user)));
     }
 
     @Override
@@ -44,20 +44,21 @@ public class ItemServiceImpl implements ItemService {
             oldItem.setAvailable(newItem.getAvailable());
         }
         log.info("Пользователь {} обновил предмет {}", user, oldItem);
-        return ItemMapper.toDto(itemRepository.updateItem(oldItem));
+        return ItemMapper.toDto(itemRepository.save(oldItem));
     }
 
     @Override
     public ItemDto getItemByIdOrThrow(Long itemId) {
         log.info("Получение предмета с id {}", itemId);
-        return ItemMapper.toDto(itemRepository.getItem(itemId)
+        return ItemMapper.toDto(itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Не найден предмет", "Не найден предмет с id " + itemId)));
     }
 
     @Override
     public List<ItemDto> getUserItems(Long userId) {
         log.info("Получение предметов пользователя с id {}", userId);
-        return itemRepository.getItems(userId).stream()
+        User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
+        return itemRepository.findAllByOwner(user).stream()
                 .map(ItemMapper::toDto)
                 .toList();
     }
@@ -69,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         log.info("Поиск предметов по слову {}", text);
-        return itemRepository.searchItems(text).stream()
+        return itemRepository.findAllByNameOrDescription(text).stream()
                 .map(ItemMapper::toDto)
                 .toList();
     }
