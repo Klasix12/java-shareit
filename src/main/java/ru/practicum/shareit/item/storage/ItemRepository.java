@@ -7,12 +7,9 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    Optional<Item> findById(Long id);
-
     List<Item> findAllByOwner(User user);
 
     @Query("select it " +
