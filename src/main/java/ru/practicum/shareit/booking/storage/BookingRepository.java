@@ -5,54 +5,66 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.dto.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.user.model.User;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBooker(User booker);
-
-    List<Booking> findAllByBookerAndStartBeforeAndEndAfter(User booker, Instant time, Instant time1);
-
-    List<Booking> findAllByBookerAndEndAfter(User booker, Instant time);
-
-    List<Booking> findAllByBookerAndStartBefore(User booker, Instant time);
-
-    List<Booking> findAllByBookerAndStatus(User booker, BookingStatus status);
+    List<Booking> findAllByBookerId(Long bookerId);
 
     @Query("select b " +
             "from Booking as b " +
-            "join b.item as i " +
+            "where b.booker.id = :bookerId " +
+            "and b.start < :time and b.end > :time")
+    List<Booking> findAllByBookerAndStartBeforeAndEndAfter(Long bookerId, LocalDateTime time);
+
+    List<Booking> findAllByBookerIdAndEndAfter(Long bookerId, LocalDateTime time);
+
+    List<Booking> findAllByBookerIdAndStartBefore(Long bookerId, LocalDateTime time);
+
+    List<Booking> findAllByBookerIdAndStatus(Long bookerId, BookingStatus status);
+
+    @Query("select b " +
+            "from Booking as b " +
+            "join fetch b.item as i " +
             "where i.owner.id = :ownerId")
-    List<Booking> findAllByOwner(Long ownerId);
+    List<Booking> findAllByOwnerId(Long ownerId);
 
     @Query("select b " +
             "from Booking as b " +
-            "join b.item as i " +
+            "join fetch b.item as i " +
             "where i.owner.id = :ownerId " +
             "and :time between b.start and b.end")
-    List<Booking> findAllByOwnerAndStartBeforeAndEndAfter(Long ownerId, Instant time);
+    List<Booking> findAllByOwnerIdAndStartBeforeAndEndAfter(Long ownerId, LocalDateTime time);
 
     @Query("select b " +
             "from Booking as b " +
-            "join b.item as i " +
+            "join fetch b.item as i " +
             "where i.owner.id = :ownerId " +
             "and :time > b.end")
-    List<Booking> findAllByOwnerAndEndAfter(Long ownerId, Instant time);
+    List<Booking> findAllByOwnerIdAndEndAfter(Long ownerId, LocalDateTime time);
 
     @Query("select b " +
             "from Booking as b " +
-            "join b.item as i " +
+            "join fetch b.item as i " +
             "where i.owner.id = :ownerId " +
             "and :time < b.start")
-    List<Booking> findALlByOwnerAndStartBefore(Long ownerId, Instant time);
+    List<Booking> findAllByOwnerIdAndStartBefore(Long ownerId, LocalDateTime time);
 
     @Query("select b " +
             "from Booking as b " +
-            "join b.item as i " +
+            "join fetch b.item as i " +
             "where i.owner.id = :ownerId " +
             "and b.status = :status")
-    List<Booking> findAllByOwnerAndStatus(Long ownerId, BookingStatus status);
+    List<Booking> findAllByOwnerIdAndStatus(Long ownerId, BookingStatus status);
+
+    @Query("select b " +
+            "from Booking as b " +
+            "where b.item.id = :itemId " +
+            "and b.booker.id = :bookerId " +
+            "and b.status = :status " +
+            "and b.end < :time")
+    Optional<Booking> findBookingByItemIdAndBookerIdAndStatusAndEndBefore(Long itemId, Long bookerId, BookingStatus status, LocalDateTime time);
 }

@@ -9,6 +9,8 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -44,7 +46,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         log.info("Удаление пользователя {}", id);
-        getUserByIdOrThrow(id);
+        if (!isUserExists(id)) {
+            throw new NotFoundException("Ошибка при удалении", "Пользователя " + id + " не существует");
+        }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Boolean isUserExists(Long id) {
+        return userRepository.existsUserById(id);
     }
 }
