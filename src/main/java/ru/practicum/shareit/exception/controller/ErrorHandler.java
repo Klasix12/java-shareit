@@ -26,6 +26,7 @@ public class ErrorHandler {
     public ErrorResponse handleNotAvailableItemException(final NotAvailableItemException e) {
         return new ErrorResponse(e.getMessage(), e.getDescription());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleUserNotBookerException(final CommentException e) {

@@ -4,11 +4,11 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 public class CommentMapper {
-    private CommentMapper() {}
+    private CommentMapper() {
+    }
 
     public static CommentDto toDto(Comment comment) {
         return CommentDto.builder()
