@@ -15,7 +15,6 @@ import ru.practicum.shareit.exception.InvalidBookingDateException;
 import ru.practicum.shareit.exception.NotAvailableItemException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UserNotItemOwnerException;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -23,12 +22,16 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
@@ -41,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidBookingDateException("Ошибка бронирования", "Неверные даты бронирования");
         }
         User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
-        Item item = ItemMapper.toEntity(itemService.getItemByIdOrThrow(bookingRequestDto.getItemId()), user);
+        Item item = itemService.getItemByIdOrThrow(bookingRequestDto.getItemId());
         if (!item.getAvailable()) {
             log.warn("Пользователь {} попытался забронировать недоступный предмет {}", userId, item.getId());
             throw new NotAvailableItemException("Невозможно забронировать предмет",
@@ -55,9 +58,8 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingDto updateBookingStatus(Long userId, Long bookingId, Boolean approved) {
         Booking booking = getBookingOrThrow(bookingId);
-        Optional<User> user = userService.getUserById(userId);
         Item item = booking.getItem();
-        if (user.isPresent() && Objects.equals(userId, item.getOwner().getId())) {
+        if (Objects.equals(userId, item.getOwner().getId())) {
             if (approved) {
                 booking.setStatus(BookingStatus.APPROVED);
             } else {
@@ -69,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
                     "Пользователь с id " + userId + " не является владельцем вещи");
         }
         log.info("Пользователь {} обновил статус предмета {}", userId, item.getId());
-        return BookingMapper.toDto(bookingRepository.save(booking));
+        return BookingMapper.toDto(booking);
     }
 
     @Override
@@ -88,9 +90,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Collection<BookingDto> getUserBookings(Long userId, BookingState state) {
-        if (!userService.isUserExists(userId)) {
-            throw new NotFoundException("Ошибка пользователя", "Не удалось найти пользователя " + userId);
-        }
+        userService.getUserByIdOrThrow(userId);
         List<Booking> bookings;
         LocalDateTime currentTime = LocalDateTime.now();
         switch (state) {
@@ -123,9 +123,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Collection<BookingDto> getOwnerBookingItems(Long userId, BookingState state) {
-        if (!userService.isUserExists(userId)) {
-            throw new NotFoundException("Ошибка пользователя", "Не удалось найти пользователя " + userId);
-        }
+        userService.getUserByIdOrThrow(userId);
         List<Booking> bookings;
         LocalDateTime currentTime = LocalDateTime.now();
         switch (state) {

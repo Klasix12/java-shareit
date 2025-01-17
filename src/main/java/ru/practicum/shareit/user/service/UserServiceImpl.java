@@ -3,21 +3,22 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDto addUser(UserDto user) {
         log.info("Добавление пользователя {}", user);
         return UserMapper.toDto(userRepository.save(UserMapper.toEntity(user)));
@@ -31,8 +32,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(Long id, UserDto user) {
-        User oldUser = UserMapper.toEntity(getUserByIdOrThrow(id));
+        User oldUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Не найден пользователь", "Не найден пользователь с id " + id));
         if (user.getName() != null) {
             oldUser.setName(user.getName());
         }
@@ -40,25 +43,13 @@ public class UserServiceImpl implements UserService {
             oldUser.setEmail(user.getEmail());
         }
         log.info("Обновление пользователя с id {}", id);
-        return UserMapper.toDto(userRepository.save(oldUser));
+        return UserMapper.toDto(oldUser);
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         log.info("Удаление пользователя {}", id);
-        if (!isUserExists(id)) {
-            throw new NotFoundException("Ошибка при удалении", "Пользователя " + id + " не существует");
-        }
         userRepository.deleteById(id);
-    }
-
-    @Override
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public Boolean isUserExists(Long id) {
-        return userRepository.existsUserById(id);
     }
 }
