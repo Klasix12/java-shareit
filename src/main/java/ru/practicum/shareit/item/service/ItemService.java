@@ -12,8 +12,6 @@ public interface ItemService {
 
     ItemDto updateItem(Long userId, ItemDto item, Long itemId);
 
-    Item getItemByIdOrThrow(Long itemId);
-
     ItemDto getItemAndCommentsOrThrow(Long itemId);
 
     List<ItemDto> getUserItems(Long userId);

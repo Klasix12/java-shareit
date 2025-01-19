@@ -49,7 +49,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto updateItem(Long userId, ItemDto newItem, Long itemId) {
-        Item oldItem = getItemByIdOrThrow(itemId);
+        Item oldItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Не найден предмет", "Не найден предмет с id " + itemId));
         if (!Objects.equals(userId, oldItem.getOwner().getId())) {
             log.warn("Пользователь {} попытался обновить вещь {} не являясь владельцем", userId, itemId);
             throw new UserNotItemOwnerException("Ошибка пользователя",
@@ -66,13 +67,6 @@ public class ItemServiceImpl implements ItemService {
         }
         log.info("Пользователь {} обновил предмет {}", userId, oldItem);
         return ItemMapper.toDto(oldItem);
-    }
-
-    @Override
-    public Item getItemByIdOrThrow(Long itemId) {
-        log.info("Получение предмета с id {}", itemId);
-        return itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Не найден предмет", "Не найден предмет с id " + itemId));
     }
 
     @Override

@@ -17,8 +17,10 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UserNotItemOwnerException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -34,8 +36,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
     private final UserService userService;
-    private final ItemService itemService;
 
     @Override
     @Transactional
@@ -43,8 +46,10 @@ public class BookingServiceImpl implements BookingService {
         if (isInvalidBookingDate(bookingRequestDto)) {
             throw new InvalidBookingDateException("Ошибка бронирования", "Неверные даты бронирования");
         }
-        User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
-        Item item = itemService.getItemByIdOrThrow(bookingRequestDto.getItemId());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Не найден пользователь", "Не найден пользователь с id " + userId));
+        Item item = itemRepository.findById(bookingRequestDto.getItemId())
+                .orElseThrow(() -> new NotFoundException("Не найден предмет", "Не найден предмет с id " + bookingRequestDto.getItemId()));
         if (!item.getAvailable()) {
             log.warn("Пользователь {} попытался забронировать недоступный предмет {}", userId, item.getId());
             throw new NotAvailableItemException("Невозможно забронировать предмет",
