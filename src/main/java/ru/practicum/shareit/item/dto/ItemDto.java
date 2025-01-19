@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.validators.OnCreate;
 
+import java.util.List;
+
 @Data
 @Builder
 public class ItemDto {
@@ -19,4 +21,10 @@ public class ItemDto {
 
     @NotNull(groups = OnCreate.class)
     private Boolean available;
+
+    private List<CommentDto> comments;
+
+    private String lastBooking;
+
+    private String nextBooking;
 }
