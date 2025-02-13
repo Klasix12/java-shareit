@@ -22,9 +22,15 @@ public class ItemDto {
     @NotNull(groups = OnCreate.class)
     private Boolean available;
 
+    private Long requestId;
+
     private List<CommentDto> comments;
 
     private String lastBooking;
 
     private String nextBooking;
+
+    public boolean hasRequestId() {
+        return requestId != null && requestId != 0;
+    }
 }

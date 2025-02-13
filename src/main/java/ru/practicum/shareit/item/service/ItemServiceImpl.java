@@ -19,8 +19,11 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -34,16 +37,23 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserService userService;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     @Transactional
     public ItemDto addItem(Long userId, ItemDto item) {
-        User user = UserMapper.toEntity(userService.getUserByIdOrThrow(userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Не найден пользователь", "Не найден пользователь с id " + userId));
+        ItemRequest req = null;
+        if (item.hasRequestId()) {
+            req = itemRequestRepository.findById(item.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Не найден запрос", "Не найден запрос с id " + item.getRequestId()));
+        }
         log.info("Пользователь {} добавил предмет {}", userId, item);
-        return ItemMapper.toDto(itemRepository.save(ItemMapper.toEntity(item, user)));
+        return ItemMapper.toDto(itemRepository.save(ItemMapper.toEntity(item, user, req)));
     }
 
     @Override
@@ -100,9 +110,7 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         log.info("Поиск предметов по слову {}", text);
-        return itemRepository.findAllByNameOrDescription(text).stream()
-                .map(ItemMapper::toDto)
-                .toList();
+        return ItemMapper.toDto(itemRepository.findAllByNameOrDescription(text));
     }
 
     @Override

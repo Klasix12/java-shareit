@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemRequestMapper {
 
-    public static ru.practicum.shareit.request.ItemRequest toEntity(ItemRequestDto dto, User user) {
+    public static ItemRequest toEntity(ItemRequestDto dto, User user) {
         return ru.practicum.shareit.request.ItemRequest.builder()
                 .id(dto.getId())
                 .requester(user)
