@@ -10,7 +10,7 @@ import ru.practicum.shareit.validator.OnUpdate;
 
 @Data
 @Builder
-public class UserRequestDto {
+public class UserDto {
     private Long id;
 
     @NotNull(groups = OnCreate.class)

@@ -19,13 +19,13 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto addUser(@Validated(OnCreate.class) @RequestBody UserDto user) {
+    public UserDto addUser(@RequestBody UserDto user) {
         log.trace("Добавление пользователя");
         return userService.addUser(user);
     }
 
     @PatchMapping("/{id}")
-    public UserDto updateUser(@Validated(OnUpdate.class) @RequestBody UserDto user,
+    public UserDto updateUser(@RequestBody UserDto user,
                               @PathVariable Long id) {
         log.trace("Обновление пользователя");
         return userService.updateUser(id, user);

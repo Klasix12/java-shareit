@@ -13,10 +13,7 @@ import ru.practicum.shareit.validators.OnUpdate;
 public class UserDto {
     private Long id;
 
-    @NotNull(groups = OnCreate.class)
     private String name;
 
-    @NotEmpty(groups = OnCreate.class)
-    @Email(message = "Неверный формат email", groups = {OnCreate.class, OnUpdate.class})
     private String email;
 }

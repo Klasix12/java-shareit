@@ -3,6 +3,7 @@ package ru.practicum.shareit.request;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -10,9 +11,6 @@ import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.util.Collection;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
@@ -29,7 +27,7 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public Collection<ItemRequestDto> getRequests(@RequestHeader(userIdHeader) @NotNull Long userId) {
+    public Collection<ItemRequestDto> getUserRequests(@RequestHeader(userIdHeader) @NotNull Long userId) {
         return service.getUserRequests(userId);
     }
 
