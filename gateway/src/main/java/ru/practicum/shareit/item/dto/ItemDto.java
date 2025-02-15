@@ -7,21 +7,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.validator.OnCreate;
 
-import java.util.List;
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequestDto {
+public class ItemDto {
     private Long id;
 
-    @NotEmpty(groups = OnCreate.class)
+    @NotEmpty
     private String name;
 
-    @NotEmpty(groups = OnCreate.class)
+    @NotEmpty
     private String description;
 
-    @NotNull(groups = OnCreate.class)
+    @NotNull
     private Boolean available;
 
     private Long requestId;
