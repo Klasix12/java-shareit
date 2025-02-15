@@ -23,37 +23,37 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto addBooking(@RequestHeader(userIdHeader) @NotNull Long userId,
-                                 @Valid @RequestBody BookingRequestDto bookingDto) {
+    public BookingDto addBooking(@RequestHeader(userIdHeader) Long userId,
+                                 @RequestBody BookingRequestDto bookingDto) {
         log.trace("Добавление бронирования");
         return bookingService.addBooking(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto updateBookingStatus(@RequestHeader(userIdHeader) @NotNull Long userId,
+    public BookingDto updateBookingStatus(@RequestHeader(userIdHeader) Long userId,
                                           @PathVariable Long bookingId,
-                                          @RequestParam @NotNull Boolean approved) {
+                                          @RequestParam Boolean approved) {
         log.trace("Обновление бронирования");
         return bookingService.updateBookingStatus(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getBooking(@RequestHeader(userIdHeader) @NotNull Long userId,
+    public BookingDto getBooking(@RequestHeader(userIdHeader) Long userId,
                                  @PathVariable Long bookingId) {
         log.trace("Получение бронирования");
         return bookingService.getBooking(userId, bookingId);
     }
 
     @GetMapping
-    public Collection<BookingDto> getBookings(@RequestHeader(userIdHeader) @NotNull Long userId,
-                                              @RequestParam(defaultValue = "ALL") BookingState state) {
+    public Collection<BookingDto> getBookings(@RequestHeader(userIdHeader) Long userId,
+                                              @RequestParam BookingState state) {
         log.trace("Получение бронирований пользователя");
         return bookingService.getUserBookings(userId, state);
     }
 
     @GetMapping("/owner")
-    public Collection<BookingDto> getBookingItems(@RequestHeader(userIdHeader) @NotNull Long userId,
-                                                  @RequestParam(defaultValue = "ALL") BookingState state) {
+    public Collection<BookingDto> getBookingItems(@RequestHeader(userIdHeader) Long userId,
+                                                  @RequestParam BookingState state) {
         log.trace("Получение владельцем его бронирований");
         return bookingService.getOwnerBookingItems(userId, state);
     }
