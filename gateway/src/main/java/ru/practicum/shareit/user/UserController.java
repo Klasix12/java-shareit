@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Object> updateUser(@Validated(OnUpdate.class) @RequestBody UserDto userDto,
-                              @PathVariable Long id) {
+                                             @PathVariable Long id) {
         log.info("Updating user {}, userId={}", userDto, id);
         return userClient.updateUser(id, userDto);
     }

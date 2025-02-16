@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 @RestController
@@ -45,9 +46,17 @@ public class ItemController {
         return itemClient.getUserItems(userId);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<Object> searchItems(@RequestParam("text") String text) {
         log.info("Search items, text={}", text);
         return itemClient.searchItems(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<Object> addComment(@RequestHeader(userIdHeader) @NotNull Long userId,
+                                             @PathVariable Long itemId,
+                                             @RequestBody CommentDto comment) {
+        log.info("Creating comment {}, userId={}, itemId={}", comment, userId, itemId);
+        return itemClient.addComment(userId, itemId, comment);
     }
 }

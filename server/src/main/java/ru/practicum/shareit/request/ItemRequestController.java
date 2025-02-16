@@ -1,9 +1,6 @@
 package ru.practicum.shareit.request;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -20,14 +17,14 @@ public class ItemRequestController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemRequestDto addRequest(@RequestHeader(userIdHeader) @NotNull Long userId,
-                                     @RequestBody @Valid ItemRequestDto request) {
+    public ItemRequestDto addRequest(@RequestHeader(userIdHeader) Long userId,
+                                     @RequestBody ItemRequestDto request) {
         request.setUserId(userId);
         return service.save(request);
     }
 
     @GetMapping
-    public Collection<ItemRequestDto> getUserRequests(@RequestHeader(userIdHeader) @NotNull Long userId) {
+    public Collection<ItemRequestDto> getUserRequests(@RequestHeader(userIdHeader) Long userId) {
         return service.getUserRequests(userId);
     }
 
