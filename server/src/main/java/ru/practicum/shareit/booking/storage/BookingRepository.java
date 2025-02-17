@@ -63,6 +63,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where b.item.id = :itemId " +
             "and b.booker.id = :bookerId " +
             "and b.status = :status " +
-            "and b.end < :time")
+            "and b.end <= :time")
     Optional<Booking> findBookingByItemIdAndBookerIdAndStatusAndEndBefore(Long itemId, Long bookerId, BookingStatus status, LocalDateTime time);
 }

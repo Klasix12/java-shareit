@@ -50,5 +50,5 @@ CREATE TABLE IF NOT EXISTS comments
     item_id BIGINT REFERENCES items (id)            NOT NULL,
     user_id BIGINT REFERENCES users (id)            NOT NULL,
     text    VARCHAR(2048)                           NOT NULL,
-    created TIMESTAMP                               NOT NULL
+    created TIMESTAMP WITHOUT TIME ZONE             NOT NULL
 );

@@ -117,8 +117,11 @@ public class ItemServiceImpl implements ItemService {
         log.info("Пользователь " + userId + " оставляет комментарий: \"" + commentRequestDto.getText() + "\" предмету " + itemId);
         Booking booking = bookingRepository.findBookingByItemIdAndBookerIdAndStatusAndEndBefore(
                         itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())
-                .orElseThrow(() -> new CommentException("Ошибка пользователя",
-                        "Пользователь " + userId + " не бронировал предмет " + itemId));
+                .orElseThrow(() -> {
+                    log.error("Ошибка, пользователь {} не бронировал предмет {}", userId, itemId);
+                    return new CommentException("Ошибка пользователя",
+                            "Пользователь " + userId + " не бронировал предмет " + itemId);
+                });
         commentRequestDto.setCreated(LocalDateTime.now());
         return CommentMapper.toDto(commentRepository
                 .save(CommentMapper.toEntity(commentRequestDto, booking.getBooker(), booking.getItem())));
