@@ -125,7 +125,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<BookingDto> getOwnerBookingItems(Long userId, BookingState state) {
+    public Collection<BookingDto> getOwnerBookings(Long userId, BookingState state) {
         userService.getUserByIdOrThrow(userId);
         List<Booking> bookings;
         LocalDateTime currentTime = LocalDateTime.now();

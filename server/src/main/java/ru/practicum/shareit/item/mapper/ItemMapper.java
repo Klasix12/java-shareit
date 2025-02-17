@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.mapper;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -20,6 +20,17 @@ public class ItemMapper {
                 .owner(user)
                 .available(item.getAvailable())
                 .itemRequest(itemRequest)
+                .build();
+    }
+
+    public static Item toEntity(ItemDto item, User user) {
+        return Item.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .owner(user)
+                .available(item.getAvailable())
+                .itemRequest(null)
                 .build();
     }
 

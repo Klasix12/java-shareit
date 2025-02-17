@@ -53,6 +53,6 @@ public class BookingController {
     public Collection<BookingDto> getBookingItems(@RequestHeader(userIdHeader) Long userId,
                                                   @RequestParam BookingState state) {
         log.trace("Получение владельцем его бронирований");
-        return bookingService.getOwnerBookingItems(userId, state);
+        return bookingService.getOwnerBookings(userId, state);
     }
 }

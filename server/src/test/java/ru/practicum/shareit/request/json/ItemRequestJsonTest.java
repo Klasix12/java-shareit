@@ -26,7 +26,6 @@ public class ItemRequestJsonTest {
                 .created(LocalDateTime.of(2025, 1, 1, 1, 1))
                 .build();
         JsonContent<ItemRequestDto> result = json.write(requestDto);
-        System.out.println(result);
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathNumberValue("$.userId").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.description").isEqualTo("desc");

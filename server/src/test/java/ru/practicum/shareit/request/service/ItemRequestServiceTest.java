@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -77,7 +77,10 @@ public class ItemRequestServiceTest {
             service.save(requestDto);
         }
 
-        User user2 = userRepository.save(user);
+        User user2 = userRepository.save(User.builder()
+                .email("email2@email.com")
+                .name("name2")
+                .build());
         ItemRequestDto requestDto2 = ItemRequestDto.builder()
                 .userId(user2.getId())
                 .created(LocalDateTime.now())

@@ -1,8 +1,9 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 public class ItemRequestMapper {
 
     public static ItemRequest toEntity(ItemRequestDto dto, User user) {
-        return ru.practicum.shareit.request.ItemRequest.builder()
+        return ItemRequest.builder()
                 .id(dto.getId())
                 .requester(user)
                 .description(dto.getDescription())

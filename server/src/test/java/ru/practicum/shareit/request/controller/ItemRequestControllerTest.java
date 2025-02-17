@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.request.ItemRequestController;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
@@ -36,6 +35,8 @@ public class ItemRequestControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    private final String headerUserId = "X-Sharer-User-Id";
+
     private final ItemRequestDto requestDto = ItemRequestDto.builder()
             .id(1L)
             .userId(1L)
@@ -50,7 +51,7 @@ public class ItemRequestControllerTest {
 
         mvc.perform(post("/requests")
                         .content(mapper.writeValueAsString(requestDto))
-                        .header("X-Sharer-User-Id", 1)
+                        .header(headerUserId, 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -67,7 +68,7 @@ public class ItemRequestControllerTest {
                 .thenReturn(List.of(requestDto));
 
         mvc.perform(get("/requests")
-                        .header("X-Sharer-User-Id", 1)
+                        .header(headerUserId, 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
