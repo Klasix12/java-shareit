@@ -13,17 +13,6 @@ public class BookingMapper {
     private BookingMapper() {
     }
 
-    public static Booking toEntity(BookingDto bookingDto, User booker, Item item) {
-        return Booking.builder()
-                .id(bookingDto.getId())
-                .booker(booker)
-                .item(item)
-                .status(bookingDto.getStatus())
-                .start(bookingDto.getStart())
-                .end(bookingDto.getEnd())
-                .build();
-    }
-
     public static Booking toEntity(BookingRequestDto bookingRequestDto, User booker, Item item) {
         return Booking.builder()
                 .booker(booker)

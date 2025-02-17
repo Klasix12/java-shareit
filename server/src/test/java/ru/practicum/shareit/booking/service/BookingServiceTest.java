@@ -12,8 +12,13 @@ import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.dto.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.storage.BookingRepository;
+import ru.practicum.shareit.exception.InvalidBookingDateException;
+import ru.practicum.shareit.exception.NotAvailableItemException;
+import ru.practicum.shareit.exception.UserNotItemOwnerException;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -23,6 +28,7 @@ import java.util.Collection;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @SpringBootTest(
@@ -74,6 +80,20 @@ public class BookingServiceTest {
     }
 
     @Test
+    void addBookingIncorrectDatesTest() {
+        bookingRequestDto.setStart(LocalDateTime.now().plusDays(100));
+        assertThrows(InvalidBookingDateException.class, () ->
+                service.addBooking(user.getId(), bookingRequestDto));
+    }
+
+    @Test
+    void addBookingWhenItemNotAvailable() {
+        item.setAvailable(false);
+        itemRepository.save(item);
+        assertThrows(NotAvailableItemException.class, () -> service.addBooking(user.getId(), bookingRequestDto));
+    }
+
+    @Test
     void updateBookingStatusTest() {
         Long bookingId = service.addBooking(user.getId(), bookingRequestDto).getId();
         Booking savedBooking = bookingRepository.findById(bookingId)
@@ -84,15 +104,22 @@ public class BookingServiceTest {
     }
 
     @Test
-    void getBooking() {
+    void wrongUserUpdateBookingStatusTest() {
         Long bookingId = service.addBooking(user.getId(), bookingRequestDto).getId();
-        Booking savedBooking = bookingRepository.findById(bookingId)
-                .orElseThrow();
+
+        assertThrows(UserNotItemOwnerException.class,
+                () -> service.updateBookingStatus(2L, bookingId, false));
+    }
+
+    @Test
+    void getBookingTest() {
+        Long bookingId = service.addBooking(user.getId(), bookingRequestDto).getId();
+        BookingDto savedBooking = service.getBooking(user.getId(), bookingId);
         assertThatBookingHasCorrectFields(savedBooking);
     }
 
     @Test
-    void getUserBookings() {
+    void getUserBookingsTest() {
         int savedItemsCount = 3;
         for (int i = 0; i < savedItemsCount; i++) {
             service.addBooking(user.getId(), bookingRequestDto);
@@ -106,11 +133,15 @@ public class BookingServiceTest {
             service.addBooking(user2.getId(), bookingRequestDto);
         }
 
-        Collection<BookingDto> userBookings = service.getUserBookings(user.getId(), BookingState.ALL);
-        assertThat(userBookings.size(), equalTo(savedItemsCount));
-        for (BookingDto b : userBookings) {
-            assertThat(b.getBooker().getId(), equalTo(user.getId()));
-        }
+        Collection<BookingDto> userBookingsAll = service.getUserBookings(user.getId(), BookingState.ALL);
+        assertThat(userBookingsAll.size(), equalTo(savedItemsCount));
+
+        assertThat(service.getUserBookings(user.getId(), BookingState.CURRENT).size(), equalTo(0));
+        assertThat(service.getUserBookings(user.getId(), BookingState.PAST).size(), equalTo(savedItemsCount));
+        assertThat(service.getUserBookings(user.getId(), BookingState.FUTURE).size(), equalTo(0));
+        assertThat(service.getUserBookings(user.getId(), BookingState.WAITING).size(), equalTo(savedItemsCount));
+        assertThat(service.getUserBookings(user.getId(), BookingState.REJECTED).size(), equalTo(0));
+
     }
 
     @Test
@@ -127,12 +158,27 @@ public class BookingServiceTest {
 
         assertThat(service.getOwnerBookings(user.getId(), BookingState.ALL).size(), equalTo(savedItemsCount));
         assertThat(service.getOwnerBookings(user2.getId(), BookingState.ALL).size(), equalTo(0));
+
+        assertThat(service.getUserBookings(user.getId(), BookingState.CURRENT).size(), equalTo(0));
+        assertThat(service.getUserBookings(user.getId(), BookingState.PAST).size(), equalTo(savedItemsCount));
+        assertThat(service.getUserBookings(user.getId(), BookingState.FUTURE).size(), equalTo(0));
+        assertThat(service.getUserBookings(user.getId(), BookingState.WAITING).size(), equalTo(savedItemsCount));
+        assertThat(service.getUserBookings(user.getId(), BookingState.REJECTED).size(), equalTo(0));
     }
 
     private void assertThatBookingHasCorrectFields(Booking booking) {
         assertThat(booking.getId(), notNullValue());
         assertThat(booking.getBooker(), equalTo(user));
         assertThat(booking.getItem(), equalTo(item));
+        assertThat(booking.getStatus(), equalTo(BookingStatus.WAITING));
+        assertThat(booking.getStart(), equalTo(bookingRequestDto.getStart()));
+        assertThat(booking.getEnd(), equalTo(bookingRequestDto.getEnd()));
+    }
+
+    private void assertThatBookingHasCorrectFields(BookingDto booking) {
+        assertThat(booking.getId(), notNullValue());
+        assertThat(booking.getBooker(), equalTo(UserMapper.toDto(user)));
+        assertThat(booking.getItem(), equalTo(ItemMapper.toDto(item)));
         assertThat(booking.getStatus(), equalTo(BookingStatus.WAITING));
         assertThat(booking.getStart(), equalTo(bookingRequestDto.getStart()));
         assertThat(booking.getEnd(), equalTo(bookingRequestDto.getEnd()));

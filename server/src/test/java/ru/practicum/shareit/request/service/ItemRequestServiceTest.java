@@ -58,13 +58,13 @@ public class ItemRequestServiceTest {
     }
 
     @Test
-    void getRequestsByRequesterIdTest() {
+    void getUserRequestsTest() {
         int savedItemsCount = 3;
         for (int i = 0; i < savedItemsCount; i++) {
             service.save(requestDto);
         }
 
-        List<ItemRequest> savedItems = itemRequestRepository.findAllByRequesterId(user.getId());
+        List<ItemRequestDto> savedItems = service.getUserRequests(user.getId());
 
         assertThat(savedItems.size(), equalTo(savedItemsCount));
         assertThatItemHasCorrectFields(savedItems.get(0));
@@ -90,7 +90,7 @@ public class ItemRequestServiceTest {
             service.save(requestDto2);
         }
 
-        List<ItemRequest> savedItems = itemRequestRepository.findAll();
+        List<ItemRequestDto> savedItems = service.getAll();
         assertThat(savedItems.size(), equalTo(savedItemsCount * 2));
         assertThatItemHasCorrectFields(savedItems.get(0));
     }
@@ -98,14 +98,20 @@ public class ItemRequestServiceTest {
     @Test
     void getById() {
         ItemRequestDto savedRequestDto = service.save(requestDto);
-        ItemRequest savedRequest = itemRequestRepository.findById(savedRequestDto.getId())
-                .orElseThrow();
+        ItemRequestDto savedRequest = service.getById(savedRequestDto.getId());
         assertThatItemHasCorrectFields(savedRequest);
     }
 
     private void assertThatItemHasCorrectFields(ItemRequest request) {
         assertThat(request.getId(), notNullValue());
         assertThat(request.getRequester().getId(), equalTo(user.getId()));
+        assertThat(request.getDescription(), equalTo(requestDto.getDescription()));
+        assertThat(request.getCreated(), notNullValue());
+    }
+
+    private void assertThatItemHasCorrectFields(ItemRequestDto request) {
+        assertThat(request.getId(), notNullValue());
+        assertThat(request.getUserId(), equalTo(user.getId()));
         assertThat(request.getDescription(), equalTo(requestDto.getDescription()));
         assertThat(request.getCreated(), notNullValue());
     }

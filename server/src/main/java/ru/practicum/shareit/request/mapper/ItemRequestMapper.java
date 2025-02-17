@@ -34,6 +34,5 @@ public class ItemRequestMapper {
         return requests.stream()
                 .map(ItemRequestMapper::toDto)
                 .collect(Collectors.toList());
-
     }
 }
