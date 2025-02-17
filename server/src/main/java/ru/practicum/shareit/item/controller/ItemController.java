@@ -1,18 +1,13 @@
 package ru.practicum.shareit.item.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.validators.OnCreate;
-import ru.practicum.shareit.validators.OnUpdate;
 
 import java.util.List;
 
@@ -28,15 +23,15 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto addItem(@RequestHeader(userIdHeader) @NotNull Long userId,
-                           @Validated(OnCreate.class) @RequestBody ItemDto item) {
+    public ItemDto addItem(@RequestHeader(userIdHeader) Long userId,
+                           @RequestBody ItemDto item) {
         log.trace("Добавление предмета");
         return itemService.addItem(userId, item);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader(userIdHeader) @NotNull Long userId,
-                              @Validated(OnUpdate.class) @RequestBody ItemDto item,
+    public ItemDto updateItem(@RequestHeader(userIdHeader) Long userId,
+                              @RequestBody ItemDto item,
                               @PathVariable Long itemId) {
         log.trace("Обновление предмета");
         return itemService.updateItem(userId, item, itemId);
@@ -49,7 +44,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getUserItems(@RequestHeader(userIdHeader) @NotNull Long userId) {
+    public List<ItemDto> getUserItems(@RequestHeader(userIdHeader) Long userId) {
         log.trace("Получение предметов пользователя");
         return itemService.getUserItems(userId);
     }
@@ -61,9 +56,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@RequestHeader(userIdHeader) @NotNull Long userId,
+    public CommentDto addComment(@RequestHeader(userIdHeader) Long userId,
                                  @PathVariable Long itemId,
-                                 @Valid @RequestBody CommentRequestDto commentRequestDto) {
+                                 @RequestBody CommentRequestDto commentRequestDto) {
         log.trace("Добавление комментария");
         return itemService.addComment(userId, itemId, commentRequestDto);
     }
