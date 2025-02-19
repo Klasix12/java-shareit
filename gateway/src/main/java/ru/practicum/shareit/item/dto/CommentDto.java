@@ -15,7 +15,7 @@ public class CommentDto {
     @NotBlank
     private String authorName;
     @NotBlank
-    @Size(max=2048)
+    @Size(max = 2048)
     private String text;
     private LocalDateTime created;
 }
