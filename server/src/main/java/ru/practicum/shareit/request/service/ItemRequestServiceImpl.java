@@ -1,6 +1,10 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository repository;
     private final UserRepository userRepository;
@@ -49,8 +54,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAll() {
-        return ItemRequestMapper.toDto(repository.findAll());
+    public List<ItemRequestDto> getAll(Integer from, Integer size) {
+        Pageable pageable = PageRequest.of(from, size, Sort.by("created").descending());
+        return repository.findAll(pageable).stream()
+                .map(ItemRequestMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -58,7 +66,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequestDto request = ItemRequestMapper.toDto(repository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Не найден запрос", "Не найден запрос с id " + requestId)));
         List<Item> items = itemRepository.findAllByItemRequestId(requestId);
-        System.out.println(items);
         request.setItems(ItemMapper.toDto(items));
         return request;
     }

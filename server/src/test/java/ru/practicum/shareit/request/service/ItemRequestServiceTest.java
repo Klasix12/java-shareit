@@ -90,9 +90,9 @@ public class ItemRequestServiceTest {
             service.save(requestDto2);
         }
 
-        List<ItemRequestDto> savedItems = service.getAll();
+        List<ItemRequestDto> savedItems = service.getAll(0, 10);
         assertThat(savedItems.size(), equalTo(savedItemsCount * 2));
-        assertThatItemHasCorrectFields(savedItems.get(0));
+        assertThatItemHasCorrectFields(savedItems.get(4));
     }
 
     @Test

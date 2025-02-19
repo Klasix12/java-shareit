@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,10 +82,10 @@ public class ItemRequestControllerTest {
 
     @Test
     void getAllTest() throws Exception {
-        when(service.getAll())
+        when(service.getAll(anyInt(), anyInt()))
                 .thenReturn(List.of(requestDto));
 
-        mvc.perform(get("/requests/all")
+        mvc.perform(get("/requests/all?from=0&size=10")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
