@@ -1,2 +1,50 @@
-# java-shareit
-Template repository for Shareit project.
+# 📌 ShareIt
+
+## 🧩 Описание проекта
+
+**ShareIt** — это учебный проект, разработанный в рамках курса Яндекс.Практикума по Java-разработке. Цель проекта — создать сервис для аренды вещей, позволяющий пользователям сдавать и арендовать различные предметы.
+
+Проект помогает освоить ключевые аспекты разработки на Java, включая создание REST API, работу с базами данных, а также принципы проектирования микросервисов.
+
+**Стек технологий:**
+
+* Java 11
+* Spring Boot
+* Hibernate
+* PostgreSQL
+* Docker
+* Maven
+* Lombok
+* JUnit
+
+## ⚙️ Инструкция по развёртыванию
+
+### 📋 Системные требования
+
+* Java Development Kit (JDK) 11
+* Docker
+* PostgreSQL
+* Maven
+
+### 🚀 Установка и запуск
+
+1. Клонируйте репозиторий:
+
+   ```bash
+   git clone https://github.com/Klasix12/java-shareit.git
+   cd java-shareit
+   ```
+
+2. Сборка проекта с использованием Maven:
+
+   ```bash
+   mvn clean install
+   ```
+
+3. Запуск контейнеров Docker:
+
+   ```bash
+   docker compose up -d
+   ```
+
+4. Приложение будет доступно по адресу: `http://localhost:8080`
